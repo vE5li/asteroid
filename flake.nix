@@ -23,7 +23,23 @@
             -v "$HOME/.config/git/config:/$HOME/.gitconfig:ro" \
             -v "$(pwd):/asteroid" \
             asteroidos-toolchain \
-            bash -c "source ./prepare-build.sh beluga && bitbake asteroid-image"
+            bash -c "
+              # Fetch all sources
+              source ./prepare-build.sh beluga
+
+              # Apply ECM cross-compilation patch (use absolute path since prepare-build.sh changes directory)
+              ECM_RECIPE_DIR='/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules'
+              mkdir -p \"\$ECM_RECIPE_DIR\"
+              cp /asteroid/patches/ecm-crosscompile.patch \"\$ECM_RECIPE_DIR/\"
+
+              # Add patch to recipe if not already present
+              if ! grep -q 'ecm-crosscompile.patch' \"/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules_git.bb\"; then
+                echo 'SRC_URI += \"file://ecm-crosscompile.patch\"' >> \"/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules_git.bb\"
+              fi
+
+              # Run the build
+              bitbake asteroid-image
+            "
         '';
       in {
         formatter = pkgs.alejandra;
