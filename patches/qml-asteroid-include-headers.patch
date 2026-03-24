@@ -1,0 +1,17 @@
+From: Lucas <user@domain>
+Subject: qml-asteroid: Include headers in -dev package
+
+The asteroidapp.h header is installed by qml-asteroid but wasn't being
+packaged in the -dev package, causing compilation failures in apps that
+depend on it.
+
+Upstream-Status: Pending
+
+--- a/recipes-asteroid/qml-asteroid/qml-asteroid_git.bb
++++ b/recipes-asteroid/qml-asteroid/qml-asteroid_git.bb
+@@ -15,4 +15,4 @@
+
+ FILES:${PN} += "/usr/lib /usr/share/icons/asteroid/"
+ FILES:${PN}-dbg += "/usr/lib/qml/org/asteroid/controls/.debug/ /usr/lib/qml/QtQuick/Controls/Styles/Asteroid/.debug/"
+-FILES:${PN}-dev += "/usr/lib/mkspecs/ /usr/share/asteroidapp/cmake/ /usr/bin/asteroid-generate-desktop"
++FILES:${PN}-dev += "/usr/lib/mkspecs/ /usr/share/asteroidapp/cmake/ /usr/bin/asteroid-generate-desktop /usr/include/"

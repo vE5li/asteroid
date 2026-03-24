@@ -37,6 +37,9 @@
                 echo 'SRC_URI += \"file://ecm-crosscompile.patch\"' >> \"/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules_git.bb\"
               fi
 
+              # Apply qml-asteroid headers patch
+              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/qml-asteroid-include-headers.patch
+
               # Apply asteroid-launcher mlite dependency patch
               patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-launcher-add-mlite.patch
 
