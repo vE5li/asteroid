@@ -27,24 +27,16 @@
               # Fetch all sources
               source ./prepare-build.sh beluga
 
-              # Apply ECM cross-compilation patch (use absolute path since prepare-build.sh changes directory)
-              ECM_RECIPE_DIR='/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules'
-              mkdir -p \"\$ECM_RECIPE_DIR\"
-              cp /asteroid/patches/ecm-crosscompile.patch \"\$ECM_RECIPE_DIR/\"
+              # Patch asteroid-app.inc directly (can't use .bbappend for .inc files)
+              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-app-add-qtbase.patch || true
 
-              # Add patch to recipe if not already present
-              if ! grep -q 'ecm-crosscompile.patch' \"/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules_git.bb\"; then
-                echo 'SRC_URI += \"file://ecm-crosscompile.patch\"' >> \"/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules_git.bb\"
+              # Copy custom layer with fixes
+              cp -r /asteroid/meta-asteroid-fixes /asteroid/src/
+
+              # Add layer to build configuration (only if not already present)
+              if ! grep -q 'meta-asteroid-fixes' /asteroid/build/conf/bblayers.conf; then
+                echo 'BBLAYERS += \"/asteroid/src/meta-asteroid-fixes\"' >> /asteroid/build/conf/bblayers.conf
               fi
-
-              # Apply qml-asteroid headers patch
-              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/qml-asteroid-include-headers.patch
-
-              # Apply asteroid-launcher mlite dependency patch
-              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-launcher-add-mlite.patch
-
-              # Apply asteroid-app qtbase dependency patch
-              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-app-add-qtbase.patch
 
               # Run the build
               bitbake asteroid-image
