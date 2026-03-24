@@ -38,10 +38,10 @@
               fi
 
               # Apply asteroid-launcher mlite dependency patch
-              patch -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-launcher-add-mlite.patch || true
+              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-launcher-add-mlite.patch
 
               # Apply asteroid-app qtbase dependency patch
-              patch -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-app-add-qtbase.patch || true
+              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-app-add-qtbase.patch
 
               # Run the build
               bitbake asteroid-image
