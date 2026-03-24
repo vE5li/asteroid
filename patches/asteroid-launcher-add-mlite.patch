@@ -1,0 +1,19 @@
+From: Lucas <user@domain>
+Subject: asteroid-launcher: Add missing mlite dependency
+
+After commit ef0846a removed mlite from qml-asteroid, asteroid-launcher
+now needs to explicitly depend on mlite since it uses find_package(Mlite5).
+
+Upstream-Status: Pending
+
+--- a/recipes-asteroid/asteroid-launcher/asteroid-launcher_git.bb
++++ b/recipes-asteroid/asteroid-launcher/asteroid-launcher_git.bb
+@@ -13,7 +13,7 @@
+ S = "${WORKDIR}/git"
+ inherit cmake_qt5 pkgconfig
+
+-DEPENDS += "qml-asteroid lipstick qttools-native timed"
++DEPENDS += "qml-asteroid lipstick qttools-native timed mlite"
+ RDEPENDS:${PN} += "qtdeclarative-qmlplugins qml-asteroid mce-qt5 qtwayland-plugins nemo-qml-plugin-time nemo-qml-plugin-configuration asteroid-wallpapers asteroid-launcher-configs"
+ FILES:${PN} += "/usr/share/asteroid-launcher/ /usr/lib/systemd/user/ /usr/share/translations/ /usr/lib/systemd/user/default.target.wants/ /usr/bin/"
+

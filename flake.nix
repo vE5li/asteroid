@@ -37,6 +37,9 @@
                 echo 'SRC_URI += \"file://ecm-crosscompile.patch\"' >> \"/asteroid/src/meta-asteroid/recipes-devtools/cmake/extra-cmake-modules_git.bb\"
               fi
 
+              # Apply asteroid-launcher mlite dependency patch
+              patch -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-launcher-add-mlite.patch || true
+
               # Run the build
               bitbake asteroid-image
             "
