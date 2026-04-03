@@ -1,0 +1,27 @@
+From: AsteroidOS Build Fix
+Subject: Fix CMAKE_MODULE_PATH being overwritten
+
+The CMAKE_MODULE_PATH was being set twice, with the second assignment
+overwriting the first one. This caused FindMlite5.cmake (located in
+${CMAKE_SOURCE_DIR}/cmake) to not be found.
+
+Fix by appending to CMAKE_MODULE_PATH instead of replacing it.
+
+Upstream-Status: Pending
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,11 +5,11 @@ project(asteroid-launcher
+
+ find_package(ECM REQUIRED NO_MODULE)
+
+-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
++list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+
+ find_package(AsteroidApp REQUIRED)
+
+-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ASTEROID_MODULE_PATH})
++list(APPEND CMAKE_MODULE_PATH ${ASTEROID_MODULE_PATH})
+
+ include(FeatureSummary)
+ include(GNUInstallDirs)

@@ -14,8 +14,8 @@
         pkgs = (import nixpkgs) {inherit system;};
 
         build = pkgs.writeShellScriptBin "build" ''
-          sudo docker build --tag asteroidos-toolchain .
-          sudo docker run \
+          docker build --tag asteroidos-toolchain .
+          docker run \
             --rm \
             -it \
             -v /etc/passwd:/etc/passwd:ro \
@@ -24,21 +24,22 @@
             -v "$(pwd):/asteroid" \
             asteroidos-toolchain \
             bash -c "
-              # Fetch all sources
+              # Fetch all sources using prepare-build.sh
               source ./prepare-build.sh beluga
 
-              # Patch asteroid-app.inc directly (can't use .bbappend for .inc files)
-              patch --forward -p1 -d /asteroid/src/meta-asteroid < /asteroid/patches/asteroid-app-add-qtbase.patch || true
-
-              # Copy custom layer with fixes
+              # Copy our custom fixes layer into the source tree
               cp -r /asteroid/meta-asteroid-fixes /asteroid/src/
 
-              # Add layer to build configuration (only if not already present)
+              # Add meta-asteroid-fixes to bblayers.conf (only if not already present)
               if ! grep -q 'meta-asteroid-fixes' /asteroid/build/conf/bblayers.conf; then
                 echo 'BBLAYERS += \"/asteroid/src/meta-asteroid-fixes\"' >> /asteroid/build/conf/bblayers.conf
               fi
 
-              # Run the build
+              # Clean state for packages we're fixing with bbappends
+              # This ensures BitBake picks up the new recipe modifications
+              bitbake -c cleansstate qml-asteroid mlite extra-cmake-modules asteroid-launcher
+
+              # Build the image
               bitbake asteroid-image
             "
         '';
